@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: API Produits & Commandes
+  version: 1.0.0
+
+tags:
+  - name: Produits
+    description: Opérations liées aux produits
+  - name: Commandes
+    description: Opérations liées aux commandes
+
+paths:
+  /products:
+    get:
+      tags:
+        - Produits
+      summary: Rechercher des produits
+      parameters:
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/QParam"
+      responses:
+        "200":
+          description: Liste de produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+              examples:
+                PlusieursProduits:
+                  summary: Exemple avec plusieurs produits
+                  value:
+                    - name: "Laptop Dell XPS 13"
+                      expiration_datetime: "2026-01-01T12:00:00Z"
+                      price: 1299.99
+                    - name: "Souris sans fil"
+                      expiration_datetime: "2025-12-31T23:59:59Z"
+                      price: 29.90
+                ListeVide:
+                  summary: Exemple sans produit trouvé
+                  value: []
+
+  /orders:
+    get:
+      tags:
+        - Commandes
+      summary: Obtenir une liste paginée de commandes
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: Liste de commandes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+              examples:
+                ExempleCommandes:
+                  summary: Exemple avec des commandes
+                  value:
+                    - identifier: 101
+                      customer_name: "Alice Johnson"
+                      creation_datetime: "2025-08-01T09:30:00Z"
+                      total_amount: 259.50
+                    - identifier: 102
+                      customer_name: "Bob Smith"
+                      creation_datetime: "2025-08-02T14:15:00Z"
+                      total_amount: 99.99
+
+    post:
+      tags:
+        - Commandes
+      summary: Créer une nouvelle commande
+      security:
+        - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+            examples:
+              NouvelleCommande:
+                summary: Exemple de requête pour créer une commande
+                value:
+                  identifier: 103
+                  customer_name: "Charlie Brown"
+                  creation_datetime: "2025-09-01T12:00:00Z"
+                  total_amount: 199.95
+      responses:
+        "201":
+          description: Commande créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+              examples:
+                CommandeCreee:
+                  summary: Exemple de commande créée
+                  value:
+                    identifier: 103
+                    customer_name: "Charlie Brown"
+                    creation_datetime: "2025-09-01T12:00:00Z"
+                    total_amount: 199.95
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Barre Chocolatée"
+        expiration_datetime:
+          type: string
+          format: date-time
+          example: "2025-09-01T15:30:00Z"
+        price:
+          type: number
+          format: float
+          example: 2.99
+      required:
+        - name
+        - expiration_datetime
+        - price
+
+    Order:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          example: 101
+        customer_name:
+          type: string
+          example: "Alice Johnson"
+        creation_datetime:
+          type: string
+          format: date-time
+          example: "2025-08-01T09:30:00Z"
+        total_amount:
+          type: number
+          format: float
+          example: 259.50
+      required:
+        - identifier
+        - customer_name
+        - creation_datetime
+        - total_amount
+
+  parameters:
+    LimitParam:
+      name: limit
+      in: query
+      description: Nombre maximum de produits à retourner
+      required: false
+      schema:
+        type: integer
+        example: 10
+
+    QParam:
+      name: q
+      in: query
+      description: Terme de recherche pour les noms de produits
+      required: false
+      schema:
+        type: string
+        example: "laptop"
+
+    PageParam:
+      name: page
+      in: query
+      description: Numéro de page pour la pagination
+      required: false
+      schema:
+        type: integer
+        example: 1
+
+    SizeParam:
+      name: size
+      in: query
+      description: Nombre d’éléments par page
+      required: false
+      schema:
+        type: integer
+        example: 20
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
