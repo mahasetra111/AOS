@@ -15,7 +15,7 @@ fake_users = [
     User(id=1, name="Alice", email="alice@example.com"),
     User(id=2, name="Bob", email="bob@example.com"),
     User(id=3, name="Charlie", email="charlie@example.com"),
-    User(id=4, name="Diana", email="diana@example.com"),
+    User(id=4, name="Diana", email="diana@example.com")
 ]
 
 #  Endpoint GET /users?page=1&size=20
